@@ -1,0 +1,11 @@
+# Editor files
+/.vscode/
+/.metals/
+/.idea/
+.DS_Store
+
+# SBT files
+/target/
+/project/target/
+/project/project/target/
+/.bsp/
