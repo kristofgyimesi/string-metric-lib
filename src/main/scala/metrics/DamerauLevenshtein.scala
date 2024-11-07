@@ -122,21 +122,4 @@ object DamerauLevenshtein {
       1 - (distances.min / maxLength)
     }
   }
-
-  def main(args: Array[String]): Unit = {
-    // Example inputs
-    val s1 = "ab"
-    val s2 = "ba"
-
-    // Mutable HashMaps for operation costs
-    val deletionCosts  = HashMap('f' -> 2, 'a' -> 1) // Deleting 'f' costs 2, deleting 'a' costs 1
-    val insertionCosts = HashMap('l' -> 1, 'n' -> 3) // Inserting 'l' costs 1, inserting 'n' costs 3
-    val substitutionCosts =
-      HashMap(('f', 'l') -> 2, ('a', 'n') -> 2) // Substituting 'f' -> 'l' costs 2, 'a' -> 'n' costs 2
-
-    // Calculate Levenshtein distance with custom costs
-    val dist = DamerauLevenshtein.distance(s1, s2, null, null, null, transpositionCosts = HashMap(('a', 'b') -> 0.5))
-
-    println(s"Levenshtein distance between '$s1' and '$s2' with custom costs is: $dist")
-  }
 }
