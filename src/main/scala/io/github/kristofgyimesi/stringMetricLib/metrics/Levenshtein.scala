@@ -1,7 +1,7 @@
-package metrics
+package io.github.kristofgyimesi.stringMetricLib.metrics
 
+import io.github.kristofgyimesi.stringMetricLib.utils.ConversionUtils._
 import scala.collection.immutable.HashMap
-import utils.ConversionUtils._
 
 object Levenshtein {
 

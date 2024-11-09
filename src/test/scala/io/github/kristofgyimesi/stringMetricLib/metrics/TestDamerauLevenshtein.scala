@@ -1,6 +1,6 @@
-package metrics
+package io.github.kristofgyimesi.stringMetricLib.metrics
 
-import metrics.DamerauLevenshtein._
+import io.github.kristofgyimesi.stringMetricLib.metrics.DamerauLevenshtein._
 import org.scalatest.funspec.AnyFunSpec
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.prop.TableDrivenPropertyChecks._
