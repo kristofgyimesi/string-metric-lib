@@ -9,7 +9,7 @@ import org.scalatest.prop._
 import scala.collection.immutable.HashMap
 class TestDamerauLevenshtein extends AnyFunSpec with Matchers {
 
-  describe("Levenshtein distance") {
+  describe("Damerau-Levenshtein distance") {
     it("should calculate original Damerau-Levenshtein distance") {
       //Arrange
       val inputs: TableFor3[String, String, Double] = Table(
@@ -62,7 +62,7 @@ class TestDamerauLevenshtein extends AnyFunSpec with Matchers {
     }
   }
 
-  describe("Levenshtein similarity") {
+  describe("Damerau-Levenshtein similarity") {
     it("should calculate the similarity value") {
       //Arrange
       val inputs =
@@ -72,17 +72,43 @@ class TestDamerauLevenshtein extends AnyFunSpec with Matchers {
           ("", "empty", null, null, null, null, 0.0),
           ("", "", null, null, null, null, 1.0),
           ("same", "same", null, null, null, null, 1.0),
-          ("a", "b", null, null, HashMap(('a', 'b') -> 3.0), null, 0.0),
-          ("a", "ab", null, HashMap('b' -> 2.0), null, null, 0.5), // Use lower distance: delete 'b'
+          ("a", "b", null, null, HashMap(('a', 'b') -> 1.0), null, 0.0),
+          ("a", "ab", HashMap('b' -> 0.5), HashMap('b' -> 1.0), null, null, 0.75), // Use lower distance: delete 'b'
           ("ab", "ba", null, null, null, HashMap(('a', 'b') -> 0.5), 0.75), // Use lower distance: transpose 'b' to 'a'
-          ("cat", "cart", HashMap('r' -> 2.0), null, null, null, 0.75), // Use lower distance: insert `r`
-          ("cats", "cat", HashMap('s' -> 2.0), HashMap('s' -> 2.0), null, null, 0.5),
+          ("cat", "cart", HashMap('r' -> 0.5), null, null, null, 0.875), // should be the same either way
+          ("cart", "cat", HashMap('r' -> 0.5), null, null, null, 0.875), // should be the same either way
           ("book", "back", null, null, null, null, 0.5)
         )
 
       // Act and assert
       forEvery(inputs) { (string1, string2, delCosts, insCosts, substCosts, transCost, expectedDist) =>
         similarity(string1, string2, delCosts, insCosts, substCosts, transCost) should equal(expectedDist)
+      }
+    }
+  }
+  
+  describe("Damerau-Levenshtein symmetric similarity") {
+    it("should calculate the similarity value with symmetric cost maps") {
+      //Arrange
+      val inputs =
+        Table(
+          ("string1", "string2", "delAndInsCosts", "substCosts", "transCosts", "expectedDist"),
+          (null, null, null, null, null, 1.0),
+          ("", "empty", null, null, null, 0.0),
+          ("", "", null, null, null, 1.0),
+          ("same", "same", null, null, null, 1.0),
+          ("a", "b", null, HashMap(('a', 'b') -> 1.0), null, 0.0),
+          ("a", "ab", HashMap('b' -> 0.5), null, null, 0.75), // insert 'b'
+          ("ab", "a", HashMap('b' -> 0.5), null, null, 0.75), // delete 'b'
+          ("ab", "ba", null, null, HashMap(('a', 'b') -> 0.5), 0.75), // Use lower distance: transpose 'b' to 'a'
+          ("cat", "cart", HashMap('r' -> 0.5), null, null, 0.875), // should be the same either way
+          ("cart", "cat", HashMap('r' -> 0.5), null, null, 0.875), // should be the same either way
+          ("book", "back", null, null, null, 0.5)
+        )
+
+      // Act and assert
+      forEvery(inputs) { (string1, string2, delAndInsCosts, substCosts, transCost, expectedDist) =>
+        symmetricSimilarity(string1, string2, delAndInsCosts, substCosts, transCost) should equal(expectedDist)
       }
     }
   }

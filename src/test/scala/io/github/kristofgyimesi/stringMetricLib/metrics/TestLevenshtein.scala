@@ -69,16 +69,43 @@ class TestLevenshtein extends AnyFunSpec with Matchers {
           ("", "empty", null, null, null, 0.0),
           ("", "", null, null, null, 1.0),
           ("same", "same", null, null, null, 1.0),
-          ("a", "b", null, null, HashMap(('a', 'b') -> 3.0), 0.0),
-          ("a", "ab", null, HashMap('b' -> 2.0), null, 0.5), // Uses distance with the lower cost: delete `b`
-          ("cat", "cart", HashMap('r' -> 2.0), null, null, 0.75), // Uses distance with the lower cost: insert `r`
-          ("cats", "cat", HashMap('s' -> 2.0), HashMap('s' -> 2.0), null, 0.5),
+          ("a", "b", null, null, HashMap(('a', 'b') -> 1.0), 0.0),
+          ("a", "ab", HashMap('b' -> 0.5), HashMap('b' -> 1.0), null, 0.75), // Use lower distance: delete 'b'
+          ("ab", "ba", null, null, null, 0.0), // delete 'a' then insert 'b'
+          ("cat", "cart", HashMap('r' -> 0.5), null, null, 0.875), // should be the same either way
+          ("cart", "cat", HashMap('r' -> 0.5), null, null, 0.875), // should be the same either way
           ("book", "back", null, null, null, 0.5)
         )
 
       // Act and assert
       forEvery(inputs) { (string1, string2, delCosts, insCosts, substCosts, expectedDist) =>
         similarity(string1, string2, delCosts, insCosts, substCosts) should equal(expectedDist)
+      }
+    }
+  }
+
+  describe("Levenshtein symmetric similarity") {
+    it("should calculate the similarity value with symmetric cost maps") {
+      //Arrange
+      val inputs =
+        Table(
+          ("string1", "string2", "delAndInsCosts", "substCosts", "expectedDist"),
+          (null, null, null, null, 1.0),
+          ("", "empty", null, null, 0.0),
+          ("", "", null, null, 1.0),
+          ("same", "same", null, null, 1.0),
+          ("a", "b", null, HashMap(('a', 'b') -> 1.0), 0.0),
+          ("a", "ab", HashMap('b' -> 0.5), null, 0.75), // insert 'b'
+          ("ab", "a", HashMap('b' -> 0.5), null, 0.75), // delete 'b'
+          ("ab", "ba", null, null, 0.0), // Use lower distance: transpose 'b' to 'a'
+          ("cat", "cart", HashMap('r' -> 0.5), null, 0.875), // should be the same either way
+          ("cart", "cat", HashMap('r' -> 0.5), null, 0.875), // should be the same either way
+          ("book", "back", null, null, 0.5)
+        )
+
+      // Act and assert
+      forEvery(inputs) { (string1, string2, delAndInsCosts, substCosts, expectedDist) =>
+        symmetricSimilarity(string1, string2, delAndInsCosts, substCosts) should equal(expectedDist)
       }
     }
   }
